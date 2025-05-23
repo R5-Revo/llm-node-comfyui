@@ -19,23 +19,33 @@ class UniversalLLMNode:
     def query(self, provider, model, prompt, max_tokens):
         try:
             if provider == "openai":
-                import openai
-                openai.api_key = os.getenv("OPENAI_API_KEY")
-                completion = openai.ChatCompletion.create(
+                from openai import OpenAI
+                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                completion = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                 )
-                return (completion.choices[0].message["content"],)
+                return (completion.choices[0].message.content,)
 
             elif provider == "anthropic":
                 import anthropic
                 api_key = os.getenv("ANTHROPIC_API_KEY")
                 client = anthropic.Anthropic(api_key=api_key)
+                sdxl_prompt = (
+                    "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
+                    "Given a scene description or list of tags, convert them into a clean, high-quality positive prompt in SDXL format.\n"
+                    "The output should be:\n"
+                    "- a single comma-separated line\n"
+                    "- with no explanations, no preface, and no extra text\n"
+                    "- following the typical SDXL prompt format (e.g., \"1girl, cherry blossoms, pink kimono, sitting, soft light, anime style\")\n"
+                    "Only output the prompt line.\n"
+                    f"Input: {prompt}"
+                )
                 completion = client.messages.create(
                     model=model,
                     max_tokens=max_tokens,
-                    messages=[{"role": "user", "content": prompt}]
+                    messages=[{"role": "user", "content": sdxl_prompt}]
                 )
                 return (completion.content[0].text,)
 
@@ -47,26 +57,30 @@ class UniversalLLMNode:
                 return (response.text,)
 
             elif provider == "groq":
-                import openai
-                openai.api_key = os.getenv("GROQ_API_KEY")
-                openai.api_base = "https://api.groq.com/openai/v1"
-                completion = openai.ChatCompletion.create(
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=os.getenv("GROQ_API_KEY"),
+                    base_url="https://api.groq.com/openai/v1"
+                )
+                completion = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                 )
-                return (completion.choices[0].message["content"],)
+                return (completion.choices[0].message.content,)
 
             elif provider == "mistral":
-                import openai
-                openai.api_key = os.getenv("MISTRAL_API_KEY")
-                openai.api_base = "https://api.mistral.ai/v1"
-                completion = openai.ChatCompletion.create(
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=os.getenv("MISTRAL_API_KEY"),
+                    base_url="https://api.mistral.ai/v1"
+                )
+                completion = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": prompt}],
                     max_tokens=max_tokens,
                 )
-                return (completion.choices[0].message["content"],)
+                return (completion.choices[0].message.content,)
 
             else:
                 return ("[ERROR] Unsupported provider.",)
