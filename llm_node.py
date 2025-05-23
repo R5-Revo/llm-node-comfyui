@@ -35,10 +35,9 @@ class UniversalLLMNode:
                 sdxl_prompt = (
                     "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
                     "Given a scene description or list of tags, convert them into a clean, high-quality positive prompt in SDXL format.\n"
-                    "The output should be:\n"
-                    "- a single comma-separated line\n"
-                    "- with no explanations, no preface, and no extra text\n"
-                    "- following the typical SDXL prompt format (e.g., \"1girl, cherry blossoms, pink kimono, sitting, soft light, anime style\")\n"
+                    "Output the prompt as a single comma-separated line, with no explanations, no preface, and no extra text.\n"
+                    "Follow this tag order strictly: girl, hairstyle, hair color, bangs, eye color, facial expression, body type, breast size, pose, situation.\n"
+                    "Example: 1girl, long hair, blonde, straight bangs, blue eyes, smiling, slender, large breasts, sitting, by the lake in early summer\n"
                     "Only output the prompt line.\n"
                     f"Input: {prompt}"
                 )
