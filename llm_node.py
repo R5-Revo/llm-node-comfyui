@@ -6,7 +6,7 @@ class UniversalLLMNode:
         return {
             "required": {
                 "provider": (["openai", "anthropic", "google", "groq", "mistral"],),
-                "model": ("STRING", {"multiline": False}),
+                "model": ("STRING", {"default": "claude-3-sonnet-20240229"}),
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 300, "min": 50, "max": 4096}),
             }
@@ -30,11 +30,12 @@ class UniversalLLMNode:
 
             elif provider == "anthropic":
                 import anthropic
-                client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+                api_key = os.getenv("ANTHROPIC_API_KEY")
+                client = anthropic.Anthropic(api_key=api_key)
                 completion = client.messages.create(
                     model=model,
                     max_tokens=max_tokens,
-                    messages=[{"role": "user", "content": prompt}],
+                    messages=[{"role": "user", "content": prompt}]
                 )
                 return (completion.content[0].text,)
 
