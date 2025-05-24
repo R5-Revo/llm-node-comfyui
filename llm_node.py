@@ -1,12 +1,44 @@
 import os
 
+OPENAI_MODELS = [
+    "gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"
+]
+ANTHROPIC_MODELS = [
+    "claude-opus-4-20250514",
+    "claude-sonnet-4-20250514",
+    "claude-3-7-sonnet-20250219",
+    "claude-3-5-haiku-20241022",
+    "claude-3-5-sonnet-20241022",
+    "claude-3-5-sonnet-20240620",
+    "claude-3-opus-20240229",
+    "claude-3-sonnet-20240229",
+    "claude-3-haiku-20240307"
+]
+GOOGLE_MODELS = [
+    "gemini-pro", "gemini-pro-vision"
+]
+GROQ_MODELS = [
+    "llama2-70b-4096", "mixtral-8x7b-32768"
+]
+MISTRAL_MODELS = [
+    "mistral-tiny", "mistral-small", "mistral-medium"
+]
+
+PROVIDER_MODELS = {
+    "openai": OPENAI_MODELS,
+    "anthropic": ANTHROPIC_MODELS,
+    "google": GOOGLE_MODELS,
+    "groq": GROQ_MODELS,
+    "mistral": MISTRAL_MODELS
+}
+
 class UniversalLLMNode:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "provider": (["openai", "anthropic", "google", "groq", "mistral"],),
-                "model": ("STRING", {"default": "claude-3-sonnet-20240229"}),
+                "provider": (list(PROVIDER_MODELS.keys()),),
+                "model": (OPENAI_MODELS,),  # デフォルトはopenai
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 300, "min": 50, "max": 4096}),
             }
@@ -18,7 +50,6 @@ class UniversalLLMNode:
 
     def query(self, provider, model, prompt, max_tokens):
         try:
-            # SDXLプロンプト生成指示文
             sdxl_prompt = (
                 "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
                 "Given a scene description or list of tags, convert them into a clean, high-quality positive prompt in SDXL format.\n"
