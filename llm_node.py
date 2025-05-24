@@ -16,78 +16,78 @@ class UniversalLLMNode:
     FUNCTION = "query"
     CATEGORY = "LLM/Universal"
 
-def query(self, provider, model, prompt, max_tokens):
-    try:
-        # SDXLプロンプト生成指示文
-        sdxl_prompt = (
-            "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
-            "Given a scene description or list of tags, convert them into a clean, high-quality positive prompt in SDXL format.\n"
-            "Output the prompt as a single comma-separated line, with no explanations, no preface, and no extra text.\n"
-            "Follow this tag order strictly: girl, hairstyle, hair color, bangs, eye color, facial expression, body type, breast size, pose, situation.\n"
-            "Example: 1girl, long hair, blonde, straight bangs, blue eyes, smiling, slender, large breasts, sitting, by the lake in early summer\n"
-            "Only output the prompt line.\n"
-            f"Input: {prompt}"
-        )
-
-        if provider == "openai":
-            from openai import OpenAI
-            client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-            completion = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": sdxl_prompt}],
-                max_tokens=max_tokens,
+    def query(self, provider, model, prompt, max_tokens):
+        try:
+            # SDXLプロンプト生成指示文
+            sdxl_prompt = (
+                "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
+                "Given a scene description or list of tags, convert them into a clean, high-quality positive prompt in SDXL format.\n"
+                "Output the prompt as a single comma-separated line, with no explanations, no preface, and no extra text.\n"
+                "Follow this tag order strictly: girl, hairstyle, hair color, bangs, eye color, facial expression, body type, breast size, pose, situation.\n"
+                "Example: 1girl, long hair, blonde, straight bangs, blue eyes, smiling, slender, large breasts, sitting, by the lake in early summer\n"
+                "Only output the prompt line.\n"
+                f"Input: {prompt}"
             )
-            return (completion.choices[0].message.content,)
 
-        elif provider == "anthropic":
-            import anthropic
-            api_key = os.getenv("ANTHROPIC_API_KEY")
-            client = anthropic.Anthropic(api_key=api_key)
-            completion = client.messages.create(
-                model=model,
-                max_tokens=max_tokens,
-                messages=[{"role": "user", "content": sdxl_prompt}]
-            )
-            return (completion.content[0].text,)
+            if provider == "openai":
+                from openai import OpenAI
+                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                completion = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": sdxl_prompt}],
+                    max_tokens=max_tokens,
+                )
+                return (completion.choices[0].message.content,)
 
-        elif provider == "google":
-            import google.generativeai as genai
-            genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-            model_obj = genai.GenerativeModel(model)
-            response = model_obj.generate_content(sdxl_prompt)
-            return (response.text,)
+            elif provider == "anthropic":
+                import anthropic
+                api_key = os.getenv("ANTHROPIC_API_KEY")
+                client = anthropic.Anthropic(api_key=api_key)
+                completion = client.messages.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    messages=[{"role": "user", "content": sdxl_prompt}]
+                )
+                return (completion.content[0].text,)
 
-        elif provider == "groq":
-            from openai import OpenAI
-            client = OpenAI(
-                api_key=os.getenv("GROQ_API_KEY"),
-                base_url="https://api.groq.com/openai/v1"
-            )
-            completion = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": sdxl_prompt}],
-                max_tokens=max_tokens,
-            )
-            return (completion.choices[0].message.content,)
+            elif provider == "google":
+                import google.generativeai as genai
+                genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+                model_obj = genai.GenerativeModel(model)
+                response = model_obj.generate_content(sdxl_prompt)
+                return (response.text,)
 
-        elif provider == "mistral":
-            from openai import OpenAI
-            client = OpenAI(
-                api_key=os.getenv("MISTRAL_API_KEY"),
-                base_url="https://api.mistral.ai/v1"
-            )
-            completion = client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": sdxl_prompt}],
-                max_tokens=max_tokens,
-            )
-            return (completion.choices[0].message.content,)
+            elif provider == "groq":
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=os.getenv("GROQ_API_KEY"),
+                    base_url="https://api.groq.com/openai/v1"
+                )
+                completion = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": sdxl_prompt}],
+                    max_tokens=max_tokens,
+                )
+                return (completion.choices[0].message.content,)
 
-        else:
-            return ("[ERROR] Unsupported provider.",)
+            elif provider == "mistral":
+                from openai import OpenAI
+                client = OpenAI(
+                    api_key=os.getenv("MISTRAL_API_KEY"),
+                    base_url="https://api.mistral.ai/v1"
+                )
+                completion = client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": sdxl_prompt}],
+                    max_tokens=max_tokens,
+                )
+                return (completion.choices[0].message.content,)
 
-    except Exception as e:
-        return (f"[LLM Error] {str(e)}",)
+            else:
+                return ("[ERROR] Unsupported provider.",)
+
+        except Exception as e:
+            return (f"[LLM Error] {str(e)}",)
 
 NODE_CLASS_MAPPINGS = {
     "UniversalLLMNode": UniversalLLMNode
