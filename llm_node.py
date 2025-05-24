@@ -24,6 +24,15 @@ MISTRAL_MODELS = [
     "mistral-tiny", "mistral-small", "mistral-medium"
 ]
 
+# 修正後
+ALL_MODELS = (
+    OPENAI_MODELS +
+    ANTHROPIC_MODELS +
+    GOOGLE_MODELS +
+    GROQ_MODELS +
+    MISTRAL_MODELS
+)
+
 PROVIDER_MODELS = {
     "openai": OPENAI_MODELS,
     "anthropic": ANTHROPIC_MODELS,
@@ -38,12 +47,12 @@ class UniversalLLMNode:
         return {
             "required": {
                 "provider": (list(PROVIDER_MODELS.keys()),),
-                "model": (OPENAI_MODELS,),  # デフォルトはopenai
+                "model": (ALL_MODELS,),  # ここをリスト型に
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 300, "min": 50, "max": 4096}),
             }
         }
-
+        
     RETURN_TYPES = ("STRING",)
     FUNCTION = "query"
     CATEGORY = "LLM/Universal"
