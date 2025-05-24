@@ -1,5 +1,7 @@
 # Universal LLM Node for ComfyUI
 
+![ワークフロー例](./Workflow_pic.png)
+
 ## これはなに？
 
 UniversalLLMNodeは、OpenAI・Anthropic（Claude）・Google Gemini・Groq・Mistralなど複数の大手LLM APIを共通インターフェースで利用できるComfyUI用カスタムノードです。  
