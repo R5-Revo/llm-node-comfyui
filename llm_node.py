@@ -1,5 +1,3 @@
-import os
-
 OPENAI_MODELS = [
     "gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"
 ]
@@ -24,7 +22,6 @@ MISTRAL_MODELS = [
     "mistral-tiny", "mistral-small", "mistral-medium"
 ]
 
-# 修正後
 ALL_MODELS = (
     OPENAI_MODELS +
     ANTHROPIC_MODELS +
@@ -47,7 +44,8 @@ class UniversalLLMNode:
         return {
             "required": {
                 "provider": (list(PROVIDER_MODELS.keys()),),
-                "model": (ALL_MODELS,),  # ここをリスト型に
+                "model": (ALL_MODELS,),
+                "api_key": ("STRING", {"multiline": False, "password": True}),  # 追加
                 "prompt": ("STRING", {"multiline": True}),
                 "max_tokens": ("INT", {"default": 300, "min": 50, "max": 4096}),
             }
@@ -57,7 +55,7 @@ class UniversalLLMNode:
     FUNCTION = "query"
     CATEGORY = "LLM/Universal"
 
-    def query(self, provider, model, prompt, max_tokens):
+    def query(self, provider, model, api_key, prompt, max_tokens):
         try:
             sdxl_prompt = (
                 "You are a professional prompt engineer for Stable Diffusion XL (SDXL).\n"
@@ -71,7 +69,7 @@ class UniversalLLMNode:
 
             if provider == "openai":
                 from openai import OpenAI
-                client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                client = OpenAI(api_key=api_key)
                 completion = client.chat.completions.create(
                     model=model,
                     messages=[{"role": "user", "content": sdxl_prompt}],
@@ -81,7 +79,6 @@ class UniversalLLMNode:
 
             elif provider == "anthropic":
                 import anthropic
-                api_key = os.getenv("ANTHROPIC_API_KEY")
                 client = anthropic.Anthropic(api_key=api_key)
                 completion = client.messages.create(
                     model=model,
@@ -92,7 +89,7 @@ class UniversalLLMNode:
 
             elif provider == "google":
                 import google.generativeai as genai
-                genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+                genai.configure(api_key=api_key)
                 model_obj = genai.GenerativeModel(model)
                 response = model_obj.generate_content(sdxl_prompt)
                 return (response.text,)
@@ -100,7 +97,7 @@ class UniversalLLMNode:
             elif provider == "groq":
                 from openai import OpenAI
                 client = OpenAI(
-                    api_key=os.getenv("GROQ_API_KEY"),
+                    api_key=api_key,
                     base_url="https://api.groq.com/openai/v1"
                 )
                 completion = client.chat.completions.create(
@@ -113,7 +110,7 @@ class UniversalLLMNode:
             elif provider == "mistral":
                 from openai import OpenAI
                 client = OpenAI(
-                    api_key=os.getenv("MISTRAL_API_KEY"),
+                    api_key=api_key,
                     base_url="https://api.mistral.ai/v1"
                 )
                 completion = client.chat.completions.create(
